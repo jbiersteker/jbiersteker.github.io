@@ -1,12 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
     const terminalOutput = document.getElementById('terminal-output');
-    let promptString = getPromptString();
-
     let isInitialized = false;
     let inputLine = ''; // Current input line
     let commandHistory = [];
     let historyIndex = -1;
     let currentPath = '/home/guest';
+
+    // Prompt String
+    function getPromptString() {
+        const pathDisplay = currentPath === '/home/guest' ? '~' : currentPath.replace('/home/guest', '~');
+        return `<span class="color-green">guest</span>@<span class="color-blue">Jasper-OS</span>:<span class="color-cyan">${pathDisplay}</span>$&nbsp;`;
+    }
+    let promptString = getPromptString();
 
     // Startup Messages and ASCII Art
     const startupMessages = [
@@ -303,20 +308,19 @@ document.addEventListener('DOMContentLoaded', () => {
         terminalOutput.innerHTML += `<div>Edit mode - Press ESC to exit</div>`;
         let editorContent = file.content;
         terminalOutput.innerHTML += `<div id="editor"><pre>${editorContent}</pre></div>`;
-        let editorMode = true;
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
 
         function editorKeyHandler(event) {
+            event.preventDefault(); // Prevent default browser actions
             if (event.key === 'Escape') {
                 // Exit editor
                 document.removeEventListener('keydown', editorKeyHandler);
                 file.content = editorContent;
-                editorMode = false;
                 showPrompt();
                 callback('');
             } else if (event.key === 'Backspace') {
                 editorContent = editorContent.slice(0, -1);
                 updateEditorContent(editorContent);
-                event.preventDefault();
             } else if (event.key === 'Enter') {
                 editorContent += '\n';
                 updateEditorContent(editorContent);
@@ -335,31 +339,88 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Prompt String
-    function getPromptString() {
-        const pathDisplay = currentPath === '/home/guest' ? '~' : currentPath.replace('/home/guest', '~');
-        return `<span class="color-green">guest</span>@<span class="color-blue">Jasper-OS</span>:<span class="color-cyan">${pathDisplay}</span>$&nbsp;`;
-    }
-
     // Initialize Terminal
     function initializeTerminal() {
-        isInitialized = true;
         printOutput('', asciiArt);
-        simulateStartupMessages(0);
+        simulateStartupMessages(0, () => {
+            isInitialized = true; // Only set to true after startup sequence
+            printOutput('', 'Type <span class="color-green">\'help\'</span> to see a list of available commands.\n');
+            showPrompt();
+            addEventListeners(); // Add event listeners after initialization
+        });
     }
 
-    function simulateStartupMessages(index) {
+    function simulateStartupMessages(index, callback) {
         if (index < startupMessages.length) {
             printOutput('', startupMessages[index]);
             setTimeout(() => {
-                simulateStartupMessages(index + 1);
+                simulateStartupMessages(index + 1, callback);
             }, 500);
         } else {
-            printOutput('', 'Type <span class="color-green">\'help\'</span> to see a list of available commands.\n');
-            showPrompt();
+            callback();
         }
     }
 
+    // Event Listener Functions
+    function onKeyDown(event) {
+        if (!isInitialized) return;
+
+        // Check if editor mode is active
+        if (document.getElementById('editor')) return;
+
+        const key = event.key;
+
+        if (key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+            inputLine += key;
+        } else if (key === 'Backspace') {
+            inputLine = inputLine.slice(0, -1);
+        } else if (key === 'Enter') {
+            removeCurrentLine();
+            commandHistory.push(inputLine);
+            historyIndex = commandHistory.length;
+            let output = processCommand(inputLine);
+            if (output !== null) { // Only show prompt if command is not asynchronous
+                if (output !== '') {
+                    printOutput(inputLine, output);
+                } else {
+                    printOutput(inputLine, '');
+                }
+                showPrompt();
+            }
+            inputLine = '';
+        } else if (key === 'ArrowUp') {
+            if (historyIndex > 0) {
+                historyIndex--;
+                inputLine = commandHistory[historyIndex];
+                updateInputLine();
+            }
+            event.preventDefault();
+        } else if (key === 'ArrowDown') {
+            if (historyIndex < commandHistory.length - 1) {
+                historyIndex++;
+                inputLine = commandHistory[historyIndex];
+            } else {
+                historyIndex = commandHistory.length;
+                inputLine = '';
+            }
+            updateInputLine();
+            event.preventDefault();
+        } else if (key === 'Tab') {
+            event.preventDefault();
+            // Optional: Implement tab completion here
+        }
+        updateInputLine();
+    }
+
+    function addEventListeners() {
+        document.addEventListener('keydown', onKeyDown);
+    }
+
+    function removeEventListeners() {
+        document.removeEventListener('keydown', onKeyDown);
+    }
+
+    // Process Command Function
     function processCommand(input) {
         const args = input.split(' ').filter(arg => arg);
         const commandName = args.shift();
@@ -369,7 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let output = command.action(args);
             if (output instanceof Promise) {
                 output.then(result => {
-                    if (result) {
+                    if (result !== '') {
                         printOutput('', result);
                     }
                     showPrompt();
@@ -385,6 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Output Functions
     function printOutput(input, output) {
         let inputHTML = '';
         if (input) {
@@ -415,54 +477,6 @@ document.addEventListener('DOMContentLoaded', () => {
             terminalOutput.scrollTop = terminalOutput.scrollHeight;
         }
     }
-
-    document.addEventListener('keydown', function(event) {
-        if (!isInitialized) return;
-
-        // Check if editor mode is active
-        if (document.getElementById('editor')) return;
-
-        const key = event.key;
-
-        if (key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
-            inputLine += key;
-        } else if (key === 'Backspace') {
-            inputLine = inputLine.slice(0, -1);
-        } else if (key === 'Enter') {
-            removeCurrentLine();
-            commandHistory.push(inputLine);
-            historyIndex = commandHistory.length;
-            let output = processCommand(inputLine);
-            if (output !== null) { // Only show prompt if command is not asynchronous
-                if (output !== '') {
-                    printOutput(inputLine, output);
-                }
-                showPrompt();
-            }
-            inputLine = '';
-        } else if (key === 'ArrowUp') {
-            if (historyIndex > 0) {
-                historyIndex--;
-                inputLine = commandHistory[historyIndex];
-                updateInputLine();
-            }
-            event.preventDefault();
-        } else if (key === 'ArrowDown') {
-            if (historyIndex < commandHistory.length - 1) {
-                historyIndex++;
-                inputLine = commandHistory[historyIndex];
-            } else {
-                historyIndex = commandHistory.length;
-                inputLine = '';
-            }
-            updateInputLine();
-            event.preventDefault();
-        } else if (key === 'Tab') {
-            event.preventDefault();
-            // Optional: Implement tab completion here
-        }
-        updateInputLine();
-    });
 
     // Focus on the window to receive key events
     window.focus();
