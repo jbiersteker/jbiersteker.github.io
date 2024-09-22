@@ -1,10 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const terminalInput = document.getElementById('terminal-input');
     const terminalOutput = document.getElementById('terminal-output');
-    const promptElement = document.getElementById('prompt');
-    const promptString = '<span class="color-green">guest</span>@<span class="color-blue">Jasper-OS</span>:<span class="color-cyan">~</span>$';
+    const promptString = '<span class="color-green">guest</span>@<span class="color-blue">Jasper-OS</span>:<span class="color-cyan">~</span>$&nbsp;';
 
     let isInitialized = false;
+    let inputLine = ''; // Current input line
+    let commandHistory = [];
+    let historyIndex = -1;
 
     // Startup Messages and ASCII Art
     const startupMessages = [
@@ -148,9 +149,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add more commands here
     };
 
-    let commandHistory = [];
-    let historyIndex = -1;
-
     function initializeTerminal() {
         isInitialized = true;
         printOutput('', asciiArt);
@@ -165,9 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 500);
         } else {
             printOutput('', 'Type <span class="color-green">\'help\'</span> to see a list of available commands.\n');
-            promptElement.innerHTML = promptString;
-            terminalInput.disabled = false;
-            terminalInput.focus();
+            showPrompt();
         }
     }
 
@@ -190,48 +186,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function printOutput(input, output) {
-        let inputLine = '';
+        let inputHTML = '';
         if (input) {
-            inputLine = `<div><span>${promptString}</span> ${input}</div>`;
+            inputHTML = `<div>${promptString}${input}</div>`;
         }
-        const outputLine = output ? `<div>${output}</div>` : '';
-        terminalOutput.innerHTML += inputLine + outputLine;
+        const outputHTML = output ? `<div>${output}</div>` : '';
+        terminalOutput.innerHTML += inputHTML + outputHTML;
         terminalOutput.scrollTop = terminalOutput.scrollHeight;
     }
 
-    terminalInput.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter') {
-            const input = terminalInput.value.trim();
-            commandHistory.push(input);
+    function showPrompt() {
+        terminalOutput.innerHTML += `<div id="current-line">${promptString}<span id="input-line"></span></div>`;
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    }
+
+    function removeCurrentLine() {
+        const currentLine = document.getElementById('current-line');
+        if (currentLine) {
+            currentLine.remove();
+        }
+    }
+
+    function updateInputLine() {
+        const inputLineElement = document.getElementById('input-line');
+        if (inputLineElement) {
+            inputLineElement.innerHTML = inputLine.replace(/ /g, '&nbsp;');
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+    }
+
+    document.addEventListener('keydown', function(event) {
+        if (!isInitialized) return;
+
+        const key = event.key;
+
+        if (key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+            inputLine += key;
+        } else if (key === 'Backspace') {
+            inputLine = inputLine.slice(0, -1);
+        } else if (key === 'Enter') {
+            removeCurrentLine();
+            commandHistory.push(inputLine);
             historyIndex = commandHistory.length;
-            const output = processCommand(input);
-            printOutput(input, output);
-            terminalInput.value = '';
-        } else if (event.key === 'ArrowUp') {
+            const output = processCommand(inputLine);
+            printOutput(inputLine, output);
+            inputLine = '';
+            showPrompt();
+        } else if (key === 'ArrowUp') {
             if (historyIndex > 0) {
                 historyIndex--;
-                terminalInput.value = commandHistory[historyIndex];
+                inputLine = commandHistory[historyIndex];
             }
             event.preventDefault();
-        } else if (event.key === 'ArrowDown') {
+        } else if (key === 'ArrowDown') {
             if (historyIndex < commandHistory.length - 1) {
                 historyIndex++;
-                terminalInput.value = commandHistory[historyIndex];
+                inputLine = commandHistory[historyIndex];
             } else {
                 historyIndex = commandHistory.length;
-                terminalInput.value = '';
+                inputLine = '';
             }
             event.preventDefault();
+        } else if (key === 'Tab') {
+            event.preventDefault();
+            // Optional: Implement tab completion here
         }
+        updateInputLine();
     });
 
-    // Focus on input when anywhere in the terminal is clicked
-    document.getElementById('terminal').addEventListener('click', () => {
-        terminalInput.focus();
-    });
-
-    // Disable input until initialization is complete
-    terminalInput.disabled = true;
+    // Focus on the window to receive key events
+    window.focus();
 
     // Initialize the terminal
     initializeTerminal();
