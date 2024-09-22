@@ -1,7 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
     const terminalInput = document.getElementById('terminal-input');
     const terminalOutput = document.getElementById('terminal-output');
-    const promptString = 'guest@mywebsite:~$';
+    const promptElement = document.getElementById('prompt');
+    const promptString = '<span class="color-green">guest</span>@<span class="color-blue">Jasper-OS</span>:<span class="color-cyan">~</span>$';
+
+    let isInitialized = false;
+
+    // Startup Messages and ASCII Art
+    const startupMessages = [
+        'Initializing Jasper-OS...',
+        'Loading modules...',
+        'Starting services...',
+        'Welcome to Jasper-OS!'
+    ];
+
+    const asciiArt = `
+<span class="color-green">      ___           ___           ___           ___           ___           ___           ___</span>
+<span class="color-green">     /\\  \\         /\\__\\         /\\__\\         /\\  \\         /\\  \\         /\\  \\         /\\__\\</span>
+<span class="color-green">    /::\\  \\       /:/ _/_       /:/ _/_       /::\\  \\       \\:\\  \\       /::\\  \\       /:/ _/_</span>
+<span class="color-green">   /:/\\:\\  \\     /:/ /\\__\\     /:/ /\\__\\     /:/\\:\\  \\       \\:\\  \\     /:/\\:\\  \\     /:/ /\\__\\</span>
+<span class="color-green">  /:/  \\:\\  \\   /:/ /:/ _/_   /:/ /:/ _/_   /:/  \\:\\  \\  ___  \\:\\  \\   /:/  \\:\\  \\   /:/ /:/ _/_</span>
+<span class="color-green"> /:/__/ \\:\\__\\ /:/_/:/ /\\__\\ /:/_/:/ /\\__\\ /:/__/ \\:\\__\\/\\  \\ \\:\\__\\ /:/__/ \\:\\__\\ /:/_/:/ /\\__\\</span>
+<span class="color-green"> \\:\\  \\ /:/  / \\:\\/:/ /:/  / \\:\\/:/ /:/  / \\:\\  \\ /:/  /\\:\\  \\ /:/  / \\:\\  \\ /:/  / \\:\\/:/ /:/  /</span>
+<span class="color-green">  \\:\\  /:/  /   \\::/_/:/  /   \\::/_/:/  /   \\:\\  /:/  /  \\:\\  /:/  /   \\:\\  /:/  /   \\::/_/:/  /</span>
+<span class="color-green">   \\:\\/:/  /     \\:\\/:/  /     \\:\\/:/  /     \\:\\/:/  /    \\:\\/:/  /     \\:\\/:/  /     \\:\\/:/  /</span>
+<span class="color-green">    \\::/  /       \\::/  /       \\::/  /       \\::/  /      \\::/  /       \\::/  /       \\::/  /</span>
+<span class="color-green">     \\/__/         \\/__/         \\/__/         \\/__/        \\/__/         \\/__/         \\/__/</span>
+`;
 
     const commands = {
         help: {
@@ -9,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
             action: function() {
                 let commandList = '';
                 for (let cmd in commands) {
-                    commandList += `${cmd} - ${commands[cmd].description}\n`;
+                    commandList += `<span class="color-green">${cmd}</span> - ${commands[cmd].description}\n`;
                 }
                 return commandList.trim();
             }
@@ -17,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ls: {
             description: 'List directory contents',
             action: function() {
-                return 'projects  games  about.txt  contact.txt';
+                return '<span class="color-blue">projects</span>  <span class="color-blue">games</span>  <span class="color-white">about.txt</span>  <span class="color-white">contact.txt</span>';
             }
         },
         cd: {
@@ -31,9 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
             action: function(args) {
                 switch (args[0]) {
                     case 'about.txt':
-                        return 'Hello! I am [Your Name], a coder and gamer. Welcome to my website!';
+                        return 'Hello! I am <span class="color-green">[Your Name]</span>, a coder and gamer. Welcome to my website!';
                     case 'contact.txt':
-                        return 'Email: your.email@example.com\nGitHub: github.com/yourusername';
+                        return 'Email: <span class="color-cyan">your.email@example.com</span>\nGitHub: <span class="color-cyan">github.com/yourusername</span>';
                     default:
                         return `cat: ${args[0]}: No such file or directory`;
                 }
@@ -68,9 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
             description: 'Display system information',
             action: function(args) {
                 if (args[0] === '-a') {
-                    return 'Linux mywebsite 5.4.0-42-generic x86_64 GNU/Linux';
+                    return 'Jasper-OS 1.0.0 x86_64 GNU/Linux';
                 } else {
-                    return 'Linux';
+                    return 'Jasper-OS';
                 }
             }
         },
@@ -126,6 +151,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let commandHistory = [];
     let historyIndex = -1;
 
+    function initializeTerminal() {
+        isInitialized = true;
+        printOutput('', asciiArt);
+        simulateStartupMessages(0);
+    }
+
+    function simulateStartupMessages(index) {
+        if (index < startupMessages.length) {
+            printOutput('', startupMessages[index]);
+            setTimeout(() => {
+                simulateStartupMessages(index + 1);
+            }, 500);
+        } else {
+            printOutput('', 'Type <span class="color-green">\'help\'</span> to see a list of available commands.\n');
+            promptElement.innerHTML = promptString;
+            terminalInput.disabled = false;
+            terminalInput.focus();
+        }
+    }
+
     function processCommand(input) {
         const args = input.split(' ').filter(arg => arg);
         const commandName = args.shift();
@@ -138,14 +183,17 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (input.trim() === '') {
             output = '';
         } else {
-            output = `${commandName}: command not found`;
+            output = `<span class="color-red">${commandName}: command not found</span>`;
         }
 
         return output;
     }
 
     function printOutput(input, output) {
-        const inputLine = `<div><span>${promptString}</span> ${input}</div>`;
+        let inputLine = '';
+        if (input) {
+            inputLine = `<div><span>${promptString}</span> ${input}</div>`;
+        }
         const outputLine = output ? `<div>${output}</div>` : '';
         terminalOutput.innerHTML += inputLine + outputLine;
         terminalOutput.scrollTop = terminalOutput.scrollHeight;
@@ -181,4 +229,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('terminal').addEventListener('click', () => {
         terminalInput.focus();
     });
+
+    // Disable input until initialization is complete
+    terminalInput.disabled = true;
+
+    // Initialize the terminal
+    initializeTerminal();
 });
