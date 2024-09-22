@@ -111,6 +111,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!path || path === '.') {
             return currentPath;
         }
+        if (typeof path !== 'string') {
+            return currentPath;
+        }
         let newPath = path;
         if (!path.startsWith('/')) {
             newPath = currentPath + '/' + path;
@@ -192,13 +195,18 @@ document.addEventListener('DOMContentLoaded', () => {
         ls: {
             description: 'List directory contents in a tree-like format',
             action: function(args) {
-                const dirPath = args[0] ? resolvePath(args[0]) : currentPath;
+                let dirPath;
+                if (args.length > 0 && args[0]) {
+                    dirPath = resolvePath(args[0]);
+                } else {
+                    dirPath = currentPath;
+                }
                 const dir = getDirectoryFromPath(dirPath);
                 if (dir) {
                     const treeStr = generateTree(dir);
                     return treeStr.trim();
                 } else {
-                    const target = args[0] || '.';
+                    const target = args.length > 0 && args[0] ? args[0] : '.';
                     return `<span class="color-red">ls: cannot access '${target}': No such file or directory</span>`;
                 }
             }
@@ -382,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Process Command Function
     function processCommand(input) {
-        const args = input.split(' ').filter(arg => arg);
+        const args = input.trim().split(' ').filter(arg => arg);
         const commandName = args.shift();
         const command = commands[commandName];
 
