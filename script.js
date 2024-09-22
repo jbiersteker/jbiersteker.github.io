@@ -1,6 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM fully loaded and parsed. JavaScript is running.');
-
     const terminalOutput = document.getElementById('terminal-output');
     let isInitialized = false;
     let inputLine = ''; // Current input line
@@ -36,41 +34,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Virtual File System
     // (Same as previous code)
-    // Add console.log statements as needed
 
     // Helper Functions for File System
     // (Same as previous code)
-    // Add console.log statements as needed
 
     // Function to generate ASCII tree
     // (Same as previous code)
-    // Add console.log statements as needed
 
     // Commands
     // (Same as previous code)
-    // Add console.log statements in command actions if necessary
 
     // Editor Function
     // (Same as previous code)
-    // Add console.log statements as needed
 
     // Initialize Terminal
     function initializeTerminal() {
-        console.log('Initializing terminal...');
         printOutput('', asciiArt);
         simulateStartupMessages(0, () => {
             isInitialized = true; // Only set to true after startup sequence
             printOutput('', 'Type <span class="color-green">\'help\'</span> to see a list of available commands.\n');
             showPrompt();
             addEventListeners(); // Add event listeners after initialization
-            console.log('Terminal initialized and ready for input.');
         });
     }
 
     function simulateStartupMessages(index, callback) {
         if (index < startupMessages.length) {
             printOutput('', startupMessages[index]);
-            console.log(`Startup message displayed: ${startupMessages[index]}`);
             setTimeout(() => {
                 simulateStartupMessages(index + 1, callback);
             }, 500);
@@ -87,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.getElementById('editor')) return;
 
         const key = event.key;
-        console.log(`Key pressed: ${key}`);
 
         if (key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
             inputLine += key;
@@ -97,14 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
             removeCurrentLine();
             commandHistory.push(inputLine);
             historyIndex = commandHistory.length;
-            console.log(`Command entered: ${inputLine}`);
             let output = processCommand(inputLine);
             if (output !== null) { // Only show prompt if command is not asynchronous
-                if (output !== '') {
-                    printOutput(inputLine, output);
-                } else {
-                    printOutput(inputLine, '');
-                }
+                printOutput(inputLine, output);
                 showPrompt();
             }
             inputLine = '';
@@ -134,7 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function addEventListeners() {
         document.addEventListener('keydown', onKeyDown);
-        console.log('Event listeners added.');
     }
 
     function removeEventListeners() {
@@ -147,19 +130,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const commandName = args.shift();
         const command = commands[commandName];
 
-        console.log(`Processing command: ${commandName} with arguments: ${args}`);
-
         if (command) {
             let output = command.action(args);
             if (output instanceof Promise) {
                 output.then(result => {
-                    if (result !== '') {
-                        printOutput('', result);
+                    if (typeof result === 'undefined') {
+                        result = '';
                     }
+                    printOutput('', result);
+                    showPrompt();
+                }).catch(error => {
+                    printOutput('', `<span class="color-red">Error: ${error}</span>`);
                     showPrompt();
                 });
                 return null; // Indicate that prompt will be shown after async operation
             } else {
+                if (typeof output === 'undefined') {
+                    output = '';
+                }
                 return output;
             }
         } else if (input.trim() === '') {
@@ -172,10 +160,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Output Functions
     function printOutput(input, output) {
         let inputHTML = '';
-        if (input) {
+        if (typeof input !== 'undefined' && input !== '') {
             inputHTML = `<div>${getPromptString()}${input}</div>`;
         }
-        const outputHTML = output ? `<div>${output}</div>` : '';
+        let outputHTML = '';
+        if (typeof output !== 'undefined' && output !== '') {
+            outputHTML = `<div>${output}</div>`;
+        }
         terminalOutput.innerHTML += inputHTML + outputHTML;
         terminalOutput.scrollTop = terminalOutput.scrollHeight;
     }
