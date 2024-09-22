@@ -25,10 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     const asciiArt = `
-<span class="color-green">   ___  ___   ___________ ___________                </span>
-<span class="color-green">  |_  |/ _ \\\\ /  ___| ___ \\\\  ___| ___ \\\\               </span>
-<span class="color-green">    | / /_\\\\ \\\\ \`--.| |_/ / |__ | |_/ /_____ ___  ___ </span>
-<span class="color-green">    | |  _  | \`--. \\\\  __/|  __||    /______/ _ \\\\ __|</span>
+<span class="color-green">     ___  ___   ___________ ___________                </span>
+<span class="color-green">    |_  |/ _ \\\\ /  ___| ___ \\\\  ___| ___ \\\\               </span>
+<span class="color-green">      | / /_\\\\ \\\\ \`--.| |_/ / |__ | |_/ /_____ ___  ___ </span>
+<span class="color-green">      | |  _  | \`--. \\\\  __/|  __||    /______/ _ \\\\ __|</span>
 <span class="color-green">/\\\\__/ / | | |/\\\\__/ / |   | |___| |\\\\ \\\\     | (_) \\\\__ \\\\</span>
 <span class="color-green">\\\\____/\\\\_| |_/\\\\____/\\\\_|   \\\\____/\\\\_| \\\\_|     \\\\___/|___/</span>
 <span class="color-green">                                                     </span>
