@@ -33,13 +33,88 @@ document.addEventListener('DOMContentLoaded', () => {
 `;
 
     // Virtual File System
-    // (Same as your existing file system)
+    const fileSystem = {
+        '/home': {
+            type: 'directory',
+            content: {
+                'guest': {
+                    type: 'directory',
+                    content: {
+                        'readme.txt': {
+                            type: 'file',
+                            content: 'Welcome to Jasper-OS. This is a simple readme file.'
+                        },
+                        'documents': {
+                            type: 'directory',
+                            content: {}
+                        }
+                    }
+                }
+            }
+        }
+    };
 
     // Helper Functions for File System
-    // (Same as your existing helper functions)
+    function getCurrentDirectory() {
+        const pathParts = currentPath.split('/').filter(part => part);
+        let currentDir = fileSystem;
+        for (let part of pathParts) {
+            if (currentDir[part] && currentDir[part].type === 'directory') {
+                currentDir = currentDir[part].content;
+            } else {
+                return null;
+            }
+        }
+        return currentDir;
+    }
 
-    // Function to generate ASCII tree
-    // (Same as your existing function)
+    function resolvePath(path) {
+        if (!path || path === '.') {
+            return currentPath;
+        }
+        let newPath = path;
+        if (!path.startsWith('/')) {
+            newPath = currentPath + '/' + path;
+        }
+        const parts = newPath.split('/').filter(part => part && part !== '.');
+        const resolvedParts = [];
+        for (let part of parts) {
+            if (part === '..') {
+                resolvedParts.pop();
+            } else {
+                resolvedParts.push(part);
+            }
+        }
+        return '/' + resolvedParts.join('/');
+    }
+
+    function getDirectoryFromPath(path) {
+        const parts = path.split('/').filter(part => part);
+        let currentDir = fileSystem;
+        for (let part of parts) {
+            if (currentDir[part] && currentDir[part].type === 'directory') {
+                currentDir = currentDir[part].content;
+            } else {
+                return null;
+            }
+        }
+        return currentDir;
+    }
+
+    function getFileFromPath(path) {
+        const parts = path.split('/').filter(part => part);
+        let currentDir = fileSystem;
+        for (let i = 0; i < parts.length - 1; i++) {
+            const part = parts[i];
+            if (currentDir[part] && currentDir[part].type === 'directory') {
+                currentDir = currentDir[part].content;
+            } else {
+                return null;
+            }
+        }
+        const fileName = parts[parts.length - 1];
+        return currentDir[fileName] || null;
+    }
 
     // Commands
     const commands = {
@@ -48,22 +123,116 @@ document.addEventListener('DOMContentLoaded', () => {
             action: function() {
                 let commandList = '';
                 for (let cmd in commands) {
-                    commandList += `<span class="color-green">${cmd}</span> - ${commands[cmd].description}\n`;
+                    if (commands.hasOwnProperty(cmd)) {
+                        let description = commands[cmd].description || 'No description available';
+                        commandList += `<span class="color-green">${cmd}</span> - ${description}\n`;
+                    }
                 }
                 return commandList.trim();
             }
         },
         ls: {
-            // (Same as before)
+            description: 'List directory contents',
+            action: function(args) {
+                const dirPath = args[0] ? resolvePath(args[0]) : currentPath;
+                const dir = getDirectoryFromPath(dirPath);
+                if (dir) {
+                    const contents = Object.keys(dir).join('  ');
+                    return contents;
+                } else {
+                    return `<span class="color-red">ls: cannot access '${args[0]}': No such file or directory</span>`;
+                }
+            }
         },
         cd: {
-            // (Same as before)
+            description: 'Change the current directory',
+            action: function(args) {
+                if (!args[0]) {
+                    currentPath = '/home/guest';
+                    return '';
+                }
+                const newPath = resolvePath(args[0]);
+                const dir = getDirectoryFromPath(newPath);
+                if (dir) {
+                    currentPath = newPath;
+                    return '';
+                } else {
+                    return `<span class="color-red">cd: ${args[0]}: No such file or directory</span>`;
+                }
+            }
         },
         cat: {
-            // (Same as before)
+            description: 'Display file contents',
+            action: function(args) {
+                if (!args[0]) {
+                    return `<span class="color-red">cat: missing file operand</span>`;
+                }
+                const filePath = resolvePath(args[0]);
+                const file = getFileFromPath(filePath);
+                if (file && file.type === 'file') {
+                    return file.content;
+                } else {
+                    return `<span class="color-red">cat: ${args[0]}: No such file or directory</span>`;
+                }
+            }
         },
-        edit: {
-            // (Same as before)
+        mkdir: {
+            description: 'Create a new directory',
+            action: function(args) {
+                if (!args[0]) {
+                    return `<span class="color-red">mkdir: missing operand</span>`;
+                }
+                const dirPath = resolvePath(args[0]);
+                const parts = dirPath.split('/').filter(part => part);
+                const dirName = parts.pop();
+                const parentPath = '/' + parts.join('/');
+                const parentDir = getDirectoryFromPath(parentPath);
+                if (parentDir) {
+                    if (!parentDir[dirName]) {
+                        parentDir[dirName] = {
+                            type: 'directory',
+                            content: {}
+                        };
+                        return '';
+                    } else {
+                        return `<span class="color-red">mkdir: cannot create directory '${args[0]}': File exists</span>`;
+                    }
+                } else {
+                    return `<span class="color-red">mkdir: cannot create directory '${args[0]}': No such file or directory</span>`;
+                }
+            }
+        },
+        touch: {
+            description: 'Create a new empty file',
+            action: function(args) {
+                if (!args[0]) {
+                    return `<span class="color-red">touch: missing file operand</span>`;
+                }
+                const filePath = resolvePath(args[0]);
+                const parts = filePath.split('/').filter(part => part);
+                const fileName = parts.pop();
+                const parentPath = '/' + parts.join('/');
+                const parentDir = getDirectoryFromPath(parentPath);
+                if (parentDir) {
+                    if (!parentDir[fileName]) {
+                        parentDir[fileName] = {
+                            type: 'file',
+                            content: ''
+                        };
+                        return '';
+                    } else {
+                        return '';
+                    }
+                } else {
+                    return `<span class="color-red">touch: cannot touch '${args[0]}': No such file or directory</span>`;
+                }
+            }
+        },
+        echo: {
+            description: 'Display a line of text',
+            action: function(args) {
+                return args.join(' ');
+            }
         },
         clear: {
             description: 'Clear the terminal screen',
@@ -72,12 +241,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 showPrompt();
                 return ''; // Return empty string to avoid printing undefined
             }
-        },
-        // (Other commands remain the same)
+        }
     };
-
-    // Editor Function
-    // (Same as your existing editor function)
 
     // Initialize Terminal
     function initializeTerminal() {
@@ -163,24 +328,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const command = commands[commandName];
 
         if (command) {
-            let output = command.action(args);
-            if (output instanceof Promise) {
-                output.then(result => {
-                    if (typeof result === 'undefined') {
-                        result = '';
+            try {
+                let output = command.action(args);
+                if (output instanceof Promise) {
+                    output.then(result => {
+                        if (typeof result === 'undefined') {
+                            result = '';
+                        }
+                        printOutput('', result);
+                        showPrompt();
+                    }).catch(error => {
+                        printOutput('', `<span class="color-red">Error: ${error}</span>`);
+                        showPrompt();
+                    });
+                    return null; // Indicate that prompt will be shown after async operation
+                } else {
+                    if (typeof output === 'undefined') {
+                        output = '';
                     }
-                    printOutput('', result);
-                    showPrompt();
-                }).catch(error => {
-                    printOutput('', `<span class="color-red">Error: ${error}</span>`);
-                    showPrompt();
-                });
-                return null; // Indicate that prompt will be shown after async operation
-            } else {
-                if (typeof output === 'undefined') {
-                    output = '';
+                    return output;
                 }
-                return output;
+            } catch (error) {
+                return `<span class="color-red">Error: ${error.message}</span>`;
             }
         } else if (input.trim() === '') {
             return '';
