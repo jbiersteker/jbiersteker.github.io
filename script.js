@@ -33,19 +33,51 @@ document.addEventListener('DOMContentLoaded', () => {
 `;
 
     // Virtual File System
-    // (Same as previous code)
+    // (Same as your existing file system)
 
     // Helper Functions for File System
-    // (Same as previous code)
+    // (Same as your existing helper functions)
 
     // Function to generate ASCII tree
-    // (Same as previous code)
+    // (Same as your existing function)
 
     // Commands
-    // (Same as previous code)
+    const commands = {
+        help: {
+            description: 'List available commands',
+            action: function() {
+                let commandList = '';
+                for (let cmd in commands) {
+                    commandList += `<span class="color-green">${cmd}</span> - ${commands[cmd].description}\n`;
+                }
+                return commandList.trim();
+            }
+        },
+        ls: {
+            // (Same as before)
+        },
+        cd: {
+            // (Same as before)
+        },
+        cat: {
+            // (Same as before)
+        },
+        edit: {
+            // (Same as before)
+        },
+        clear: {
+            description: 'Clear the terminal screen',
+            action: function() {
+                terminalOutput.innerHTML = '';
+                showPrompt();
+                return ''; // Return empty string to avoid printing undefined
+            }
+        },
+        // (Other commands remain the same)
+    };
 
     // Editor Function
-    // (Same as previous code)
+    // (Same as your existing editor function)
 
     // Initialize Terminal
     function initializeTerminal() {
