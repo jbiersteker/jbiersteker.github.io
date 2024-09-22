@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let commandHistory = [];
     let historyIndex = -1;
     let currentPath = '/home/guest';
+    let interactiveSelectionMode = false;
+    let interactiveItems = [];
+    let selectedItemIndex = 0;
 
     // Prompt String
     function getPromptString() {
@@ -193,6 +196,34 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
         ls: {
+            description: 'List directory contents with interactive selection',
+            action: function(args) {
+                const dirPath = args.length > 0 && args[0] ? resolvePath(args[0]) : currentPath;
+                const dir = getDirectoryFromPath(dirPath);
+                if (dir) {
+                    // Prepare items sorted with directories first
+                    const dirEntries = [];
+                    const fileEntries = [];
+                    for (let name in dir) {
+                        if (dir[name].type === 'directory') {
+                            dirEntries.push({ name, type: 'directory' });
+                        } else {
+                            fileEntries.push({ name, type: 'file' });
+                        }
+                    }
+                    interactiveItems = dirEntries.concat(fileEntries);
+                    selectedItemIndex = 0;
+                    interactiveSelectionMode = true;
+                    removeCurrentLine();
+                    displayInteractiveList();
+                    return null; // Indicate that prompt will be shown after exiting interactive mode
+                } else {
+                    const target = args.length > 0 && args[0] ? args[0] : '.';
+                    return `<span class="color-red">ls: cannot access '${target}': No such file or directory</span>`;
+                }
+            }
+        },
+        tree: {
             description: 'List directory contents in a tree-like format',
             action: function(args) {
                 let dirPath;
@@ -207,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return treeStr.trim();
                 } else {
                     const target = args.length > 0 && args[0] ? args[0] : '.';
-                    return `<span class="color-red">ls: cannot access '${target}': No such file or directory</span>`;
+                    return `<span class="color-red">tree: cannot access '${target}': No such file or directory</span>`;
                 }
             }
         },
@@ -340,6 +371,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Check if editor mode is active
         if (document.getElementById('editor')) return;
 
+        if (interactiveSelectionMode) {
+            handleInteractiveSelection(event);
+            return;
+        }
+
         const key = event.key;
 
         if (key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
@@ -378,6 +414,72 @@ document.addEventListener('DOMContentLoaded', () => {
             // Optional: Implement tab completion here
         }
         updateInputLine();
+    }
+
+    function handleInteractiveSelection(event) {
+        const key = event.key;
+        if (key === 'ArrowUp') {
+            if (selectedItemIndex > 0) {
+                selectedItemIndex--;
+                displayInteractiveList();
+            }
+            event.preventDefault();
+        } else if (key === 'ArrowDown') {
+            if (selectedItemIndex < interactiveItems.length - 1) {
+                selectedItemIndex++;
+                displayInteractiveList();
+            }
+            event.preventDefault();
+        } else if (key === 'Enter') {
+            const selectedItem = interactiveItems[selectedItemIndex];
+            interactiveSelectionMode = false;
+            removeCurrentLine();
+            if (selectedItem.type === 'file') {
+                const filePath = currentPath + '/' + selectedItem.name;
+                const output = commands.cat.action([selectedItem.name]);
+                printOutput(`cat ${selectedItem.name}`, output);
+            } else if (selectedItem.type === 'directory') {
+                const outputCd = commands.cd.action([selectedItem.name]);
+                if (outputCd) {
+                    printOutput(`cd ${selectedItem.name}`, outputCd);
+                } else {
+                    // Automatically run ls after cd
+                    const outputLs = commands.ls.action([]);
+                    if (outputLs !== null) {
+                        printOutput(`ls`, outputLs);
+                        showPrompt();
+                    }
+                    return; // Exit without showing prompt again
+                }
+            }
+            showPrompt();
+        } else if (key === 'Escape') {
+            interactiveSelectionMode = false;
+            removeCurrentLine();
+            showPrompt();
+        }
+    }
+
+    function displayInteractiveList() {
+        // Clear the previous display
+        removeCurrentLine();
+
+        // Build the display string
+        let displayStr = '';
+        for (let i = 0; i < interactiveItems.length; i++) {
+            const item = interactiveItems[i];
+            const isSelected = i === selectedItemIndex;
+            const itemType = item.type === 'directory' ? '<span class="color-blue">[Dir]</span>' : '<span class="color-green">[File]</span>';
+            const line = `${itemType} ${item.name}`;
+            if (isSelected) {
+                displayStr += `<div class="selected-item">${line}</div>`;
+            } else {
+                displayStr += `<div>${line}</div>`;
+            }
+        }
+
+        terminalOutput.innerHTML += displayStr;
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
     }
 
     function addEventListeners() {
