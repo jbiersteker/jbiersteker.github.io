@@ -1,0 +1,52 @@
+body {
+    background-color: #000;
+    color: #0f0;
+    font-family: monospace;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#terminal {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+#terminal-output {
+    flex-grow: 1;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
+
+#terminal-input-line {
+    display: flex;
+}
+
+#prompt {
+    margin-right: 5px;
+}
+
+#terminal-input {
+    background: none;
+    border: none;
+    color: #0f0;
+    flex-grow: 1;
+    font-family: inherit;
+    font-size: inherit;
+    outline: none;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #333;
+}
+
+::-webkit-scrollbar-track {
+    background: #000;
+}
