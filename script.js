@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Virtual File System
     const fileSystem = {
-        '/home': {
+        'home': {
             type: 'directory',
             content: {
                 'guest': {
@@ -46,7 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         'documents': {
                             type: 'directory',
-                            content: {}
+                            content: {
+                                // Additional files or directories can be added here
+                            }
                         }
                     }
                 }
@@ -140,7 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const contents = Object.keys(dir).join('  ');
                     return contents;
                 } else {
-                    return `<span class="color-red">ls: cannot access '${args[0]}': No such file or directory</span>`;
+                    const target = args[0] || '.';
+                    return `<span class="color-red">ls: cannot access '${target}': No such file or directory</span>`;
                 }
             }
         },
