@@ -40,14 +40,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 'guest': {
                     type: 'directory',
                     content: {
-                        'readme.txt': {
+                        'about.txt': {
                             type: 'file',
-                            content: 'Welcome to Jasper-OS. This is a simple readme file.'
+                            content: 'This is the about file.'
                         },
-                        'documents': {
+                        'contact.txt': {
+                            type: 'file',
+                            content: 'Contact information goes here.'
+                        },
+                        'docs': {
                             type: 'directory',
                             content: {
-                                // Additional files or directories can be added here
+                                'project_list.txt': {
+                                    type: 'file',
+                                    content: 'List of projects.'
+                                },
+                                'resume.txt': {
+                                    type: 'file',
+                                    content: 'Resume content.'
+                                }
+                            }
+                        },
+                        'photos': {
+                            type: 'directory',
+                            content: {
+                                'profile.png': {
+                                    type: 'file',
+                                    content: 'Binary data...'
+                                },
+                                'vacation.jpg': {
+                                    type: 'file',
+                                    content: 'Binary data...'
+                                }
+                            }
+                        },
+                        'scripts': {
+                            type: 'directory',
+                            content: {
+                                'calculator.py': {
+                                    type: 'file',
+                                    content: 'print("Calculator script")'
+                                },
+                                'hello_world.js': {
+                                    type: 'file',
+                                    content: 'console.log("Hello, World!");'
+                                }
                             }
                         }
                     }
@@ -118,6 +155,25 @@ document.addEventListener('DOMContentLoaded', () => {
         return currentDir[fileName] || null;
     }
 
+    // Function to generate directory tree
+    function generateTree(dirContent, prefix = '', isLast = true) {
+        let treeStr = '';
+        const entries = Object.keys(dirContent);
+        entries.forEach((entry, index) => {
+            const isDir = dirContent[entry].type === 'directory';
+            const isLastEntry = index === entries.length - 1;
+            const connector = isLastEntry ? '└── ' : '├── ';
+            const newPrefix = prefix + (isLast ? '    ' : '│   ');
+
+            treeStr += `${prefix}${connector}${entry}\n`;
+
+            if (isDir) {
+                treeStr += generateTree(dirContent[entry].content, newPrefix, isLastEntry);
+            }
+        });
+        return treeStr;
+    }
+
     // Commands
     const commands = {
         help: {
@@ -134,13 +190,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
         ls: {
-            description: 'List directory contents',
+            description: 'List directory contents in a tree-like format',
             action: function(args) {
                 const dirPath = args[0] ? resolvePath(args[0]) : currentPath;
                 const dir = getDirectoryFromPath(dirPath);
                 if (dir) {
-                    const contents = Object.keys(dir).join('  ');
-                    return contents;
+                    const treeStr = generateTree(dir);
+                    return treeStr.trim();
                 } else {
                     const target = args[0] || '.';
                     return `<span class="color-red">ls: cannot access '${target}': No such file or directory</span>`;
