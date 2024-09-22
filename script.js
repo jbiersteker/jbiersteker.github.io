@@ -418,13 +418,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleInteractiveSelection(event) {
         const key = event.key;
-        if (key === 'ArrowUp') {
+        if (key === 'ArrowLeft') {
             if (selectedItemIndex > 0) {
                 selectedItemIndex--;
                 displayInteractiveList();
             }
             event.preventDefault();
-        } else if (key === 'ArrowDown') {
+        } else if (key === 'ArrowRight') {
             if (selectedItemIndex < interactiveItems.length - 1) {
                 selectedItemIndex++;
                 displayInteractiveList();
@@ -435,7 +435,6 @@ document.addEventListener('DOMContentLoaded', () => {
             interactiveSelectionMode = false;
             removeCurrentLine();
             if (selectedItem.type === 'file') {
-                const filePath = currentPath + '/' + selectedItem.name;
                 const output = commands.cat.action([selectedItem.name]);
                 printOutput(`cat ${selectedItem.name}`, output);
             } else if (selectedItem.type === 'directory') {
@@ -465,18 +464,18 @@ document.addEventListener('DOMContentLoaded', () => {
         removeCurrentLine();
 
         // Build the display string
-        let displayStr = '';
+        let displayStr = '<div>';
         for (let i = 0; i < interactiveItems.length; i++) {
             const item = interactiveItems[i];
             const isSelected = i === selectedItemIndex;
-            const itemType = item.type === 'directory' ? '<span class="color-blue">[Dir]</span>' : '<span class="color-green">[File]</span>';
-            const line = `${itemType} ${item.name}`;
+            const itemType = item.type === 'directory' ? '<span class="color-blue">' + item.name + '</span>' : '<span class="color-green">' + item.name + '</span>';
             if (isSelected) {
-                displayStr += `<div class="selected-item">${line}</div>`;
+                displayStr += `<span class="selected-item">${itemType}</span>&nbsp;`;
             } else {
-                displayStr += `<div>${line}</div>`;
+                displayStr += `${itemType}&nbsp;`;
             }
         }
+        displayStr += '</div>';
 
         terminalOutput.innerHTML += displayStr;
         terminalOutput.scrollTop = terminalOutput.scrollHeight;
