@@ -38,6 +38,47 @@ document.addEventListener('DOMContentLoaded', () => {
                         'guest': {
                             type: 'directory',
                             contents: {
+                                'docs': {
+                                    type: 'directory',
+                                    contents: {
+                                        'resume.txt': {
+                                            type: 'file',
+                                            content: 'This is my resume.',
+                                        },
+                                        'project_list.txt': {
+                                            type: 'file',
+                                            content: 'List of projects.',
+                                        },
+                                    },
+                                },
+                                'photos': {
+                                    type: 'directory',
+                                    contents: {
+                                        'vacation.jpg': {
+                                            type: 'file',
+                                            content: '[Image content]',
+                                        },
+                                        'profile.png': {
+                                            type: 'file',
+                                            content: '[Image content]',
+                                        },
+                                    },
+                                },
+                                'scripts': {
+                                    type: 'directory',
+                                    contents: {
+                                        'hello_world.js': {
+                                            type: 'file',
+                                            content: 'console.log("Hello, world!");',
+                                            executable: true,
+                                        },
+                                        'calculator.py': {
+                                            type: 'file',
+                                            content: 'print("Calculator script")',
+                                            executable: true,
+                                        },
+                                    },
+                                },
                                 'about.txt': {
                                     type: 'file',
                                     content: 'Hello! I am [Your Name], a coder and gamer. Welcome to my website!',
@@ -46,54 +87,32 @@ document.addEventListener('DOMContentLoaded', () => {
                                     type: 'file',
                                     content: 'Email: your.email@example.com\nGitHub: github.com/yourusername',
                                 },
-                                'scripts': {
-                                    type: 'directory',
-                                    contents: {
-                                        'ls.js': {
-                                            type: 'file',
-                                            content: `ls: {
-    description: 'List directory contents',
-    action: function(args) {
-        // ... command implementation ...
-    }
-}`,
-                                            executable: true,
-                                        },
-                                        'cat.js': {
-                                            type: 'file',
-                                            content: `cat: {
-    description: 'Read file contents',
-    action: function(args) {
-        // ... command implementation ...
-    }
-}`,
-                                            executable: true,
-                                        },
-                                        'cd.js': {
-                                            type: 'file',
-                                            content: `cd: {
-    description: 'Change directory',
-    action: function(args) {
-        // ... command implementation ...
-    }
-}`,
-                                            executable: true,
-                                        },
-                                    },
+                            },
+                        },
+                    },
+                },
+                'var': {
+                    type: 'directory',
+                    contents: {
+                        'log': {
+                            type: 'directory',
+                            contents: {
+                                'system.log': {
+                                    type: 'file',
+                                    content: 'System log contents.',
                                 },
                             },
                         },
                     },
                 },
-                'bin': {
-                    type: 'directory',
-                    contents: {
-                        // Place executables here
-                    },
-                },
                 'etc': {
                     type: 'directory',
-                    contents: {},
+                    contents: {
+                        'config.cfg': {
+                            type: 'file',
+                            content: 'Configuration settings.',
+                        },
+                    },
                 },
             },
         },
@@ -130,6 +149,23 @@ document.addEventListener('DOMContentLoaded', () => {
         return obj;
     }
 
+    // Function to generate ASCII tree
+    function generateTree(obj, prefix = '') {
+        let tree = '';
+        const entries = Object.entries(obj.contents);
+        entries.forEach((entry, index) => {
+            const [name, item] = entry;
+            const isLast = index === entries.length - 1;
+            const connector = isLast ? '└── ' : '├── ';
+            tree += `${prefix}${connector}${name}\n`;
+            if (item.type === 'directory') {
+                const newPrefix = prefix + (isLast ? '    ' : '│   ');
+                tree += generateTree(item, newPrefix);
+            }
+        });
+        return tree;
+    }
+
     // Commands
     const commands = {
         help: {
@@ -148,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let path = args[0] || '.';
                 const dir = getPathObject(path);
                 if (dir && dir.type === 'directory') {
-                    return Object.keys(dir.contents).join('  ');
+                    return generateTree(dir);
                 } else {
                     return `ls: cannot access '${path}': No such file or directory`;
                 }
@@ -269,8 +305,6 @@ document.addEventListener('DOMContentLoaded', () => {
         terminalOutput.innerHTML += `<div id="editor"><pre>${editorContent}</pre></div>`;
         let editorMode = true;
 
-        document.addEventListener('keydown', editorKeyHandler);
-
         function editorKeyHandler(event) {
             if (event.key === 'Escape') {
                 // Exit editor
@@ -291,6 +325,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateEditorContent(editorContent);
             }
         }
+
+        document.addEventListener('keydown', editorKeyHandler);
 
         function updateEditorContent(content) {
             const editorElement = document.getElementById('editor').querySelector('pre');
@@ -338,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     showPrompt();
                 });
-                return ''; // Return empty string for now
+                return null; // Indicate that prompt will be shown after async operation
             } else {
                 return output;
             }
@@ -397,8 +433,10 @@ document.addEventListener('DOMContentLoaded', () => {
             commandHistory.push(inputLine);
             historyIndex = commandHistory.length;
             let output = processCommand(inputLine);
-            if (output !== '') {
-                printOutput(inputLine, output);
+            if (output !== null) { // Only show prompt if command is not asynchronous
+                if (output !== '') {
+                    printOutput(inputLine, output);
+                }
                 showPrompt();
             }
             inputLine = '';
@@ -406,6 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (historyIndex > 0) {
                 historyIndex--;
                 inputLine = commandHistory[historyIndex];
+                updateInputLine();
             }
             event.preventDefault();
         } else if (key === 'ArrowDown') {
@@ -416,6 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 historyIndex = commandHistory.length;
                 inputLine = '';
             }
+            updateInputLine();
             event.preventDefault();
         } else if (key === 'Tab') {
             event.preventDefault();
