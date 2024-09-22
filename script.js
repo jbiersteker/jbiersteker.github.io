@@ -25,10 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     const asciiArt = `
-<span class="color-green">     ___  ___   ___________ ___________                </span>
-<span class="color-green">    |_  |/ _ \\\\ /  ___| ___ \\\\  ___| ___ \\\\               </span>
-<span class="color-green">      | / /_\\\\ \\\\ \`--.| |_/ / |__ | |_/ /_____ ___  ___ </span>
-<span class="color-green">      | |  _  | \`--. \\\\  __/|  __||    /______/ _ \\\\ __|</span>
+<span class="color-green">   ___  ___   ___________ ___________                </span>
+<span class="color-green">  |_  |/ _ \\\\ /  ___| ___ \\\\  ___| ___ \\\\               </span>
+<span class="color-green">    | / /_\\\\ \\\\ \`--.| |_/ / |__ | |_/ /_____ ___  ___ </span>
+<span class="color-green">    | |  _  | \`--. \\\\  __/|  __||    /______/ _ \\\\ __|</span>
 <span class="color-green">/\\\\__/ / | | |/\\\\__/ / |   | |___| |\\\\ \\\\     | (_) \\\\__ \\\\</span>
 <span class="color-green">\\\\____/\\\\_| |_/\\\\____/\\\\_|   \\\\____/\\\\_| \\\\_|     \\\\___/|___/</span>
 <span class="color-green">                                                     </span>
@@ -195,6 +195,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 return commandList.trim();
             }
         },
+        tree: {
+            description: 'List directory contents in a tree-like format',
+            action: function(args) {
+                let dirPath;
+                if (args.length > 0 && args[0]) {
+                    dirPath = resolvePath(args[0]);
+                } else {
+                    dirPath = currentPath;
+                }
+                const dir = getDirectoryFromPath(dirPath);
+                if (dir) {
+                    const treeStr = generateTree(dir);
+                    return treeStr.trim();
+                } else {
+                    const target = args.length > 0 && args[0] ? args[0] : '.';
+                    return `<span class="color-red">tree: cannot access '${target}': No such file or directory</span>`;
+                }
+            }
+        },
         ls: {
             description: 'List directory contents with interactive selection',
             action: function(args) {
@@ -214,31 +233,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     interactiveItems = dirEntries.concat(fileEntries);
                     selectedItemIndex = 0;
                     interactiveSelectionMode = true;
-                    removeCurrentLine();
+                    inputLine = ''; // Clear input line
+                    updateInputLine(); // Clear the input display
                     displayInteractiveList();
                     return null; // Indicate that prompt will be shown after exiting interactive mode
                 } else {
                     const target = args.length > 0 && args[0] ? args[0] : '.';
                     return `<span class="color-red">ls: cannot access '${target}': No such file or directory</span>`;
-                }
-            }
-        },
-        tree: {
-            description: 'List directory contents in a tree-like format',
-            action: function(args) {
-                let dirPath;
-                if (args.length > 0 && args[0]) {
-                    dirPath = resolvePath(args[0]);
-                } else {
-                    dirPath = currentPath;
-                }
-                const dir = getDirectoryFromPath(dirPath);
-                if (dir) {
-                    const treeStr = generateTree(dir);
-                    return treeStr.trim();
-                } else {
-                    const target = args.length > 0 && args[0] ? args[0] : '.';
-                    return `<span class="color-red">tree: cannot access '${target}': No such file or directory</span>`;
                 }
             }
         },
@@ -433,7 +434,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (key === 'Enter') {
             const selectedItem = interactiveItems[selectedItemIndex];
             interactiveSelectionMode = false;
-            removeCurrentLine();
+            inputLine = '';
+            updateInputLine();
             if (selectedItem.type === 'file') {
                 const output = commands.cat.action([selectedItem.name]);
                 printOutput(`cat ${selectedItem.name}`, output);
@@ -441,52 +443,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 const outputCd = commands.cd.action([selectedItem.name]);
                 if (outputCd) {
                     printOutput(`cd ${selectedItem.name}`, outputCd);
-                } else {
-                    // Automatically run ls after cd
-                    const outputLs = commands.ls.action([]);
-                    if (outputLs !== null) {
-                        printOutput(`ls`, outputLs);
-                        showPrompt();
-                    }
-                    return; // Exit without showing prompt again
                 }
+                // Automatically run ls after cd
+                const outputLs = commands.ls.action([]);
+                if (outputLs !== null) {
+                    printOutput(`ls`, outputLs);
+                    showPrompt();
+                }
+                return; // Exit without showing prompt again
             }
             showPrompt();
         } else if (key === 'Escape') {
             interactiveSelectionMode = false;
-            removeCurrentLine();
+            inputLine = '';
+            updateInputLine();
             showPrompt();
         }
     }
 
     function displayInteractiveList() {
-        // Clear the previous display
-        removeCurrentLine();
-
         // Build the display string
-        let displayStr = '<div>';
+        let displayStr = '';
         for (let i = 0; i < interactiveItems.length; i++) {
             const item = interactiveItems[i];
             const isSelected = i === selectedItemIndex;
-            const itemType = item.type === 'directory' ? '<span class="color-blue">' + item.name + '</span>' : '<span class="color-green">' + item.name + '</span>';
+            const itemName = item.type === 'directory' ? `<span class="color-blue">${item.name}</span>` : `<span class="color-green">${item.name}</span>`;
             if (isSelected) {
-                displayStr += `<span class="selected-item">${itemType}</span>&nbsp;`;
+                displayStr += `<span class="selected-item">${itemName}</span>&nbsp;`;
             } else {
-                displayStr += `${itemType}&nbsp;`;
+                displayStr += `${itemName}&nbsp;`;
             }
         }
-        displayStr += '</div>';
 
-        terminalOutput.innerHTML += displayStr;
-        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        // Update the input line with the interactive list
+        const inputLineElement = document.getElementById('input-line');
+        if (inputLineElement) {
+            inputLineElement.innerHTML = displayStr.trim();
+        }
     }
 
     function addEventListeners() {
         document.addEventListener('keydown', onKeyDown);
-    }
-
-    function removeEventListeners() {
-        document.removeEventListener('keydown', onKeyDown);
     }
 
     // Process Command Function
