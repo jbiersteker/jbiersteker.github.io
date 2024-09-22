@@ -84,6 +84,7 @@ body {
 
 /* Highlight selected item */
 .selected-item {
-    background-color: #555;
+    background-color: #3390ff; /* Adjusted to a noticeable blue */
     color: #FFFFFF;
+    border-radius: 3px;
 }
