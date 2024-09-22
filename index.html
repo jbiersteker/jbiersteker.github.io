@@ -4,11 +4,26 @@
     <meta charset="UTF-8">
     <title>Jasper-OS Terminal</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Inline styles for the debugging indicator */
+        #debug-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: red;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
+    <div id="debug-indicator">JavaScript is running: false</div>
     <div id="terminal">
         <div id="terminal-output"></div>
     </div>
+    <script>
+        // Debugging code to update the indicator
+        document.getElementById('debug-indicator').textContent = 'JavaScript is running: true';
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
