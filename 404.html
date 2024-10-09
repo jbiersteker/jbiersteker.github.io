@@ -1,1 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>404 - Page Not Found</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body onload="displayErrorMessage()">
+    <section id="error-page">
+        <h1>Oops!</h1>
+        <p id="error-message"></p>
+        <a href="index.html">Go back to Home</a>
+    </section>
+
+    <!-- Include JavaScript File -->
+    <script>
+        // 404 page messages
+        const errorMessages = [
+            "Error 404: The code gremlins must have eaten this page!",
+            "Oops! This page is still compiling... Check back soon!",
+            "This page took a day off to fix some bugs. Try again later!",
+            "404 Error: The programmer is sleeping. Shhh...",
+            "Looks like you found a null pointer!",
+            "This page is undefined. Much like some variables.",
+            "Alert: Missing page detected! Initiating search with 0 results.",
+            "System.out.println('Page not found');",
+            "We could not find this page; maybe try turning it off and on again?",
+            "If at first you don't succeed, call it version 1.0 and move on!"
+        ];
+
+        function typeIntroText(text, elementId) {
+            let i = 0;
+            const speed = 50; // Typing speed in milliseconds
+            const element = document.getElementById(elementId);
+            element.textContent = '';
+
+            function typeWriter() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, speed);
+                }
+            }
+            typeWriter();
+        }
+
+        function displayErrorMessage() {
+            const randomIndex = Math.floor(Math.random() * errorMessages.length);
+            const errorMessage = errorMessages[randomIndex];
+            typeIntroText(errorMessage, 'error-message');
+        }
+    </script>
+</body>
+</html>
 
