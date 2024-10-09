@@ -1,90 +1,165 @@
-body {
-    background-color: #1E1E1E;
-    color: #FFFFFF; /* Default text color set to white */
-    font-family: 'Courier New', Courier, monospace;
+/* styles.css */
+
+/* Reset default styles */
+* {
     margin: 0;
     padding: 0;
-    overflow: hidden;
-}
-
-#terminal {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    padding: 10px;
     box-sizing: border-box;
 }
 
-#terminal-output {
-    flex-grow: 1;
-    overflow-y: auto;
-    white-space: pre-wrap;
+body {
+    background-color: #1a2e1a; /* Dark green background */
+    color: #ffffff;
+    font-family: 'Comic Sans MS', 'Comic Sans', cursive; /* Placeholder for playful font */
+    background-image: url('images/dots-pattern.png'); /* Dots background */
+    background-repeat: repeat;
+    background-attachment: fixed;
 }
 
-#terminal-output div {
-    line-height: 1.4em;
+nav {
+    background-color: #0f1d0f; /* Slightly darker green */
+    padding: 10px;
 }
 
-#input-line::after {
-    content: '';
-    display: inline-block;
-    width: 10px;
-    height: 20px;
-    background-color: #FFFFFF;
-    margin-left: 2px;
-    animation: blink 1s step-start 0s infinite;
+nav ul {
+    list-style-type: none;
+    display: flex;
+    justify-content: center;
 }
 
-@keyframes blink {
-    50% {
-        opacity: 0;
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+nav ul li a img {
+    width: 24px;
+    height: 24px;
+    margin-right: 5px;
+}
+
+section {
+    padding: 50px;
+    border-bottom: 2px solid #ffffff; /* Simple hand-drawn line as divider */
+}
+
+section h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.project-list, .blog-list {
+    list-style-type: none;
+}
+
+.project-list li, .blog-list li {
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.project-list li img, .blog-list li img {
+    width: 100px;
+    height: 100px;
+    margin-right: 20px;
+}
+
+.social-links, .social-icons {
+    list-style-type: none;
+    display: flex;
+    justify-content: center;
+}
+
+.social-links li, .social-icons li {
+    margin: 0 10px;
+}
+
+.social-links li a, .social-icons li a {
+    color: #ffffff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.social-links li a img, .social-icons li a img {
+    width: 24px;
+    height: 24px;
+    margin-right: 5px;
+}
+
+footer {
+    background-color: #0f1d0f;
+    padding: 20px;
+    text-align: center;
+}
+
+#cookie-consent {
+    position: fixed;
+    bottom: 0;
+    background-color: #0f1d0f;
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+}
+
+#cookie-consent p {
+    display: inline;
+    margin-right: 10px;
+}
+
+#cookie-consent button {
+    background-color: #ffffff;
+    color: #0f1d0f;
+    border: none;
+    padding: 5px 10px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 15px; /* Rounded hand-drawn style */
+    font-family: inherit;
+}
+
+#intro-text {
+    font-size: 3em;
+    text-align: center;
+    margin-top: 50px;
+}
+
+.tagline {
+    text-align: center;
+    font-size: 1.5em;
+    margin-top: 20px;
+}
+
+/* Hover effects */
+a:hover, button:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    animation: erase 0.5s forwards;
+}
+
+@keyframes erase {
+    to {
+        color: transparent;
+        text-shadow: 0 0 8px #1a2e1a;
     }
 }
 
-::-webkit-scrollbar {
-    width: 8px;
+/* Redraw after some time */
+a, button {
+    animation: redraw 1s forwards;
+    animation-delay: 1s;
 }
 
-::-webkit-scrollbar-thumb {
-    background: #555;
+@keyframes redraw {
+    to {
+        color: #ffffff;
+        text-shadow: none;
+    }
 }
 
-::-webkit-scrollbar-track {
-    background: #1E1E1E;
-}
-
-/* Color Classes */
-.color-green {
-    color: #00FF00;
-}
-
-.color-yellow {
-    color: #FFFF00;
-}
-
-.color-blue {
-    color: #5DADE2;
-}
-
-.color-red {
-    color: #FF5733;
-}
-
-.color-cyan {
-    color: #1ABC9C;
-}
-
-.color-magenta {
-    color: #AF7AC5;
-}
-
-.color-white {
-    color: #FFFFFF;
-}
-
-/* Highlight selected item */
-.selected-item {
-    background-color: #3390ff; /* Adjusted to a noticeable blue */
-    color: #FFFFFF;
-    border-radius: 3px;
-}
