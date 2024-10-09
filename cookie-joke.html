@@ -9,18 +9,31 @@
     <section id="cookie-jar">
         <h1>Welcome to the Cookie Jar!</h1>
         <p>We promise these cookies are gluten-free... in code terms.</p>
-        <img src="images/cookie.png" alt="Cookie Image" id="cookie-image">
+        <div class="cookie-container">
+            <img src="images/cookie.png" alt="Cookie Image" id="cookie-image">
+            <img src="images/bowl.png" alt="Bowl Image" id="bowl-image">
+        </div>
         <p>Click the cookie to eat it!</p>
     </section>
 
     <!-- Include JavaScript Code -->
     <script>
         const cookieImage = document.getElementById('cookie-image');
+        const bowlImage = document.getElementById('bowl-image');
+
         cookieImage.addEventListener('click', () => {
-            cookieImage.src = 'images/empty-plate.png';
-            alert('Yum! That was a delicious virtual cookie.');
+            // Add animation classes
+            cookieImage.classList.add('eat-cookie');
+            bowlImage.classList.add('wobble');
+
+            // After animation ends, change the image to empty plate
+            setTimeout(() => {
+                cookieImage.src = 'images/empty-plate.png';
+                cookieImage.alt = 'Empty Plate';
+                cookieImage.classList.remove('eat-cookie');
+                bowlImage.classList.remove('wobble');
+            }, 2000); // Duration should match the CSS animation duration
         });
     </script>
 </body>
 </html>
-
