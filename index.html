@@ -5,16 +5,18 @@
     <title>Jasper's Portfolio</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="favicon.ico">
+    <!-- Font Awesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <!-- Navigation Menu -->
     <nav>
         <ul>
-            <li><a href="#home"><img src="icons/home.svg" alt="Home Icon">Home</a></li>
-            <li><a href="#about"><img src="icons/about.svg" alt="About Icon">About</a></li>
-            <li><a href="#projects"><img src="icons/projects.svg" alt="Projects Icon">Projects</a></li>
-            <li><a href="#blog"><img src="icons/blog.svg" alt="Blog Icon">Blog</a></li>
-            <li><a href="#contact"><img src="icons/contact.svg" alt="Contact Icon">Contact</a></li>
+            <li><a href="#home"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="#about"><i class="fas fa-user"></i> About</a></li>
+            <li><a href="#projects"><i class="fas fa-folder-open"></i> Projects</a></li>
+            <li><a href="#blog"><i class="fas fa-blog"></i> Blog</a></li>
+            <li><a href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
         </ul>
     </nav>
 
@@ -27,7 +29,7 @@
     <!-- About Section -->
     <section id="about">
         <h2>About Me</h2>
-        <p>I am a student that likes to program in his free time.</p>
+        <p>I am a student that likes to program in his free time. When not coding, I'm debugging my code.</p>
     </section>
 
     <!-- Projects Section -->
@@ -36,10 +38,26 @@
         <ul class="project-list">
             <li>
                 <img src="images/project-placeholder.png" alt="Project Image">
-                <h3>Placeholder Project</h3>
-                <p>PLACEHOLDER</p>
+                <div class="project-info">
+                    <h3>Placeholder Project</h3>
+                    <p>PLACEHOLDER - Some projects may contain traces of caffeine.</p>
+                </div>
             </li>
-            <!-- Add more placeholder projects as needed -->
+            <!-- Additional placeholder projects -->
+            <li>
+                <img src="images/project-placeholder.png" alt="Project Image">
+                <div class="project-info">
+                    <h3>Placeholder Project</h3>
+                    <p>PLACEHOLDER - Some projects may contain traces of caffeine.</p>
+                </div>
+            </li>
+            <li>
+                <img src="images/project-placeholder.png" alt="Project Image">
+                <div class="project-info">
+                    <h3>Placeholder Project</h3>
+                    <p>PLACEHOLDER - Some projects may contain traces of caffeine.</p>
+                </div>
+            </li>
         </ul>
     </section>
 
@@ -49,10 +67,26 @@
         <ul class="blog-list">
             <li>
                 <img src="images/blog-placeholder.png" alt="Blog Post Image">
-                <h3>Placeholder Blog Post</h3>
-                <p>PLACEHOLDER</p>
+                <div class="blog-info">
+                    <h3>Placeholder Blog Post</h3>
+                    <p>PLACEHOLDER</p>
+                </div>
             </li>
-            <!-- Add more placeholder blog posts as needed -->
+            <!-- Additional placeholder blog posts -->
+            <li>
+                <img src="images/blog-placeholder.png" alt="Blog Post Image">
+                <div class="blog-info">
+                    <h3>Placeholder Blog Post</h3>
+                    <p>PLACEHOLDER</p>
+                </div>
+            </li>
+            <li>
+                <img src="images/blog-placeholder.png" alt="Blog Post Image">
+                <div class="blog-info">
+                    <h3>Placeholder Blog Post</h3>
+                    <p>PLACEHOLDER</p>
+                </div>
+            </li>
         </ul>
     </section>
 
@@ -60,8 +94,12 @@
     <section id="contact">
         <h2>Contact</h2>
         <ul class="social-links">
-            <li><a href="https://github.com/jbiersteker" target="_blank"><img src="icons/github.svg" alt="GitHub Icon">GitHub</a></li>
-            <!-- Add other social media links if desired -->
+            <li>
+                <a href="https://github.com/jbiersteker" target="_blank" title="Click here to see where all the magic (and bugs) happen!">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+            </li>
+            <!-- Additional social media links can be added here -->
         </ul>
     </section>
 
@@ -69,8 +107,12 @@
     <footer>
         <p>Code crafted with 0 bugs (that we know of).</p>
         <ul class="social-icons">
-            <li><a href="https://github.com/jbiersteker" target="_blank"><img src="icons/github.svg" alt="GitHub Icon"></a></li>
-            <!-- Add other social media icons if desired -->
+            <li>
+                <a href="https://github.com/jbiersteker" target="_blank" title="Click here to see where all the magic (and bugs) happen!">
+                    <i class="fab fa-github"></i>
+                </a>
+            </li>
+            <!-- Additional social media icons can be added here -->
         </ul>
     </footer>
 
