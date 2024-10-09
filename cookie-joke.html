@@ -1,1 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cookie Jar</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <section id="cookie-jar">
+        <h1>Welcome to the Cookie Jar!</h1>
+        <p>We promise these cookies are gluten-free... in code terms.</p>
+        <img src="images/cookie.png" alt="Cookie Image" id="cookie-image">
+        <p>Click the cookie to eat it!</p>
+    </section>
+
+    <!-- Include JavaScript Code -->
+    <script>
+        const cookieImage = document.getElementById('cookie-image');
+        cookieImage.addEventListener('click', () => {
+            cookieImage.src = 'images/empty-plate.png';
+            alert('Yum! That was a delicious virtual cookie.');
+        });
+    </script>
+</body>
+</html>
 
