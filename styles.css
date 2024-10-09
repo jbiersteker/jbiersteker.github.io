@@ -10,15 +10,20 @@
 body {
     background-color: #1a2e1a; /* Dark green background */
     color: #ffffff;
-    font-family: 'Comic Sans MS', 'Comic Sans', cursive; /* Placeholder for playful font */
-    background-image: url('images/dots-pattern.png'); /* Dots background */
-    background-repeat: repeat;
+    font-family: 'Comic Sans MS', 'Comic Sans', cursive; /* Playful font */
+    background-image: radial-gradient(circle, #2e4d2e 1px, transparent 1px);
+    background-size: 20px 20px; /* Subtle dots pattern */
     background-attachment: fixed;
+    line-height: 1.6;
 }
 
 nav {
     background-color: #0f1d0f; /* Slightly darker green */
-    padding: 10px;
+    padding: 10px 0;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
 }
 
 nav ul {
@@ -36,38 +41,61 @@ nav ul li a {
     text-decoration: none;
     display: flex;
     align-items: center;
+    font-size: 1.2em;
+    transition: color 0.3s;
 }
 
-nav ul li a img {
-    width: 24px;
-    height: 24px;
-    margin-right: 5px;
+nav ul li a i {
+    margin-right: 8px;
+}
+
+nav ul li a:hover {
+    color: #00bfff; /* Accent color on hover */
 }
 
 section {
-    padding: 50px;
+    padding: 100px 50px 50px 50px; /* Top padding accounts for fixed nav */
     border-bottom: 2px solid #ffffff; /* Simple hand-drawn line as divider */
 }
 
 section h2 {
-    font-size: 2em;
+    font-size: 2.5em;
     margin-bottom: 20px;
+    text-align: center;
 }
 
 .project-list, .blog-list {
     list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .project-list li, .blog-list li {
     margin-bottom: 30px;
     display: flex;
     align-items: center;
+    width: 80%;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    transition: background-color 0.3s;
+}
+
+.project-list li:hover, .blog-list li:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .project-list li img, .blog-list li img {
     width: 100px;
     height: 100px;
+    object-fit: cover;
     margin-right: 20px;
+    border-radius: 10px;
+}
+
+.project-info, .blog-info {
+    flex: 1;
 }
 
 .social-links, .social-icons {
@@ -85,55 +113,80 @@ section h2 {
     text-decoration: none;
     display: flex;
     align-items: center;
+    font-size: 1.5em;
+    transition: color 0.3s;
 }
 
-.social-links li a img, .social-icons li a img {
-    width: 24px;
-    height: 24px;
-    margin-right: 5px;
+.social-links li a i, .social-icons li a i {
+    margin-right: 8px;
+}
+
+.social-links li a:hover, .social-icons li a:hover {
+    color: #00bfff; /* Accent color on hover */
 }
 
 footer {
     background-color: #0f1d0f;
     padding: 20px;
     text-align: center;
+    position: relative;
+}
+
+footer p {
+    margin-bottom: 10px;
+}
+
+footer .social-icons a {
+    font-size: 1.5em;
 }
 
 #cookie-consent {
     position: fixed;
     bottom: 0;
-    background-color: #0f1d0f;
+    background-color: rgba(15, 29, 15, 0.95);
     width: 100%;
-    padding: 10px;
+    padding: 15px;
     text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
 #cookie-consent p {
-    display: inline;
-    margin-right: 10px;
+    margin-right: 15px;
 }
 
 #cookie-consent button {
     background-color: #ffffff;
     color: #0f1d0f;
     border: none;
-    padding: 5px 10px;
+    padding: 8px 15px;
     margin: 0 5px;
     cursor: pointer;
-    border-radius: 15px; /* Rounded hand-drawn style */
+    border-radius: 20px; /* Rounded hand-drawn style */
     font-family: inherit;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+#cookie-consent button:hover {
+    background-color: #00bfff;
+    transform: scale(1.1);
 }
 
 #intro-text {
     font-size: 3em;
     text-align: center;
-    margin-top: 50px;
+    margin-top: 80px;
+    min-height: 60px; /* To prevent layout shift during typing */
 }
 
 .tagline {
     text-align: center;
     font-size: 1.5em;
     margin-top: 20px;
+    font-style: italic;
+    color: #a3d9a5;
 }
 
 /* Hover effects */
@@ -143,17 +196,17 @@ a:hover, button:hover {
     animation: erase 0.5s forwards;
 }
 
+/* Redraw after some time */
+a, button {
+    animation: redraw 1s forwards;
+    animation-delay: 1s;
+}
+
 @keyframes erase {
     to {
         color: transparent;
         text-shadow: 0 0 8px #1a2e1a;
     }
-}
-
-/* Redraw after some time */
-a, button {
-    animation: redraw 1s forwards;
-    animation-delay: 1s;
 }
 
 @keyframes redraw {
@@ -163,3 +216,75 @@ a, button {
     }
 }
 
+/* Animations for cookie page */
+.cookie-container {
+    position: relative;
+    width: 200px;
+    margin: 20px auto;
+}
+
+#bowl-image {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    transition: transform 0.3s;
+}
+
+#cookie-image {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    cursor: pointer;
+    transition: transform 2s, opacity 2s;
+}
+
+.eat-cookie {
+    transform: translateX(-50%) scale(0.5);
+    opacity: 0;
+}
+
+@keyframes wobble {
+    0% { transform: translateX(-50%) rotate(0deg); }
+    25% { transform: translateX(-50%) rotate(5deg); }
+    50% { transform: translateX(-50%) rotate(-5deg); }
+    75% { transform: translateX(-50%) rotate(3deg); }
+    100% { transform: translateX(-50%) rotate(0deg); }
+}
+
+.wobble {
+    animation: wobble 0.5s;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+    }
+
+    .project-list li, .blog-list li {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+
+    .project-list li img, .blog-list li img {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .cookie-container {
+        width: 150px;
+    }
+
+    #bowl-image {
+        width: 120px;
+    }
+
+    #cookie-image {
+        width: 80px;
+    }
+}
