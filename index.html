@@ -2,13 +2,86 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Jasper-OS Terminal</title>
+    <title>Jasper's Portfolio</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon.ico">
 </head>
 <body>
-    <div id="terminal">
-        <div id="terminal-output"></div>
+    <!-- Navigation Menu -->
+    <nav>
+        <ul>
+            <li><a href="#home"><img src="icons/home.svg" alt="Home Icon">Home</a></li>
+            <li><a href="#about"><img src="icons/about.svg" alt="About Icon">About</a></li>
+            <li><a href="#projects"><img src="icons/projects.svg" alt="Projects Icon">Projects</a></li>
+            <li><a href="#blog"><img src="icons/blog.svg" alt="Blog Icon">Blog</a></li>
+            <li><a href="#contact"><img src="icons/contact.svg" alt="Contact Icon">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- Introduction Section -->
+    <section id="home">
+        <h1 id="intro-text"></h1>
+        <p class="tagline">"Professional ChatGPT User"</p>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <h2>About Me</h2>
+        <p>I am a student that likes to program in his free time.</p>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+        <h2>Projects</h2>
+        <ul class="project-list">
+            <li>
+                <img src="images/project-placeholder.png" alt="Project Image">
+                <h3>Placeholder Project</h3>
+                <p>PLACEHOLDER</p>
+            </li>
+            <!-- Add more placeholder projects as needed -->
+        </ul>
+    </section>
+
+    <!-- Blog Section -->
+    <section id="blog">
+        <h2>Blog</h2>
+        <ul class="blog-list">
+            <li>
+                <img src="images/blog-placeholder.png" alt="Blog Post Image">
+                <h3>Placeholder Blog Post</h3>
+                <p>PLACEHOLDER</p>
+            </li>
+            <!-- Add more placeholder blog posts as needed -->
+        </ul>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <h2>Contact</h2>
+        <ul class="social-links">
+            <li><a href="https://github.com/jbiersteker" target="_blank"><img src="icons/github.svg" alt="GitHub Icon">GitHub</a></li>
+            <!-- Add other social media links if desired -->
+        </ul>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>Code crafted with 0 bugs (that we know of).</p>
+        <ul class="social-icons">
+            <li><a href="https://github.com/jbiersteker" target="_blank"><img src="icons/github.svg" alt="GitHub Icon"></a></li>
+            <!-- Add other social media icons if desired -->
+        </ul>
+    </footer>
+
+    <!-- Cookie Consent Joke -->
+    <div id="cookie-consent">
+        <p>We use cookies to enhance your experience.</p>
+        <button onclick="showCookieJoke()">Accept</button>
+        <button onclick="showCookieJoke()">Decline</button>
     </div>
+
+    <!-- Include JavaScript File -->
     <script src="script.js"></script>
 </body>
 </html>
